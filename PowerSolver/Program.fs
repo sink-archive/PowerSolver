@@ -33,6 +33,6 @@ let main argv =
     let solved = solve x z
     sw.Stop()
     
-    printfn $"Solved: %f{x}^%s{string solved} = %f{z}, Took %i{sw.ElapsedMilliseconds}ms to compute"
+    printfn $"Solved: %f{x} ^ %s{string solved} = %f{z}, Took %i{sw.ElapsedMilliseconds}ms to compute"
     
     0 // return an integer exit code
