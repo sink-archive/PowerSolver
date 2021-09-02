@@ -3,11 +3,11 @@ open System.Diagnostics
 
 // dont make me deal with c# janky math funcs in f#
 let round (places: int) (num: float) = Math.Round(num,places)
-
 let roundDecimal = round 13 // this number sets how many decimal places we actually care about
 
+
 let consoleIn (message : string) =
-    Console.Write (message + ": ")
+    printf "%s" (message + ": ")
     Console.ReadLine() |> float
 
 // should be a recursive binary search
@@ -25,7 +25,7 @@ let solve x z = solveRecurse x z 1.0 1.0
 
 [<EntryPoint>]
 let main argv =
-    Console.WriteLine "in the equation x^y = z:"
+    printfn "in the equation x^y = z:"
     let x = consoleIn "please enter x"
     let z = consoleIn "please enter z"
     
