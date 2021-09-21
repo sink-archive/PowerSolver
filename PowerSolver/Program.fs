@@ -1,27 +1,44 @@
 open System
 open System.Diagnostics
 
-// tail recursive generic binary search
-type BinarySearchCheck = Finish | TooHigh | TooLow
+// tail recursive hybrid search
+type SearchComparisonCheck = Finish | TooHigh | TooLow
 
-let binarySearch evalFunc startPoint =
-    let rec searchRec evalFunc current interval =
-        let evaluated = evalFunc current
+type LinearRecResult =
+        | Accurate of float
+        | Inaccurate of float
+
+let hybridSearch checkFunc =
+    let rec linearRec evalFunc accumulator =
+        match evalFunc accumulator with
+        | Finish -> Accurate(accumulator)
+        | TooHigh -> Inaccurate(accumulator)
+        | TooLow -> linearRec evalFunc (accumulator + 1.0)
+
+    let rec binaryRec checkFunc current interval =
+        let evaluated = checkFunc current
         match evaluated with
         | Finish -> current
-        | TooHigh -> searchRec evalFunc (current - interval) (interval / 2.0)
-        | TooLow -> searchRec evalFunc (current + interval) (interval / 2.0)
+        | TooHigh -> binaryRec checkFunc (current - interval) (interval / 2.0)
+        | TooLow -> binaryRec checkFunc (current + interval) (interval / 2.0)
     
-    searchRec evalFunc startPoint (startPoint / 2.0)
+    let linearRes = linearRec checkFunc 0.0
+    match linearRes with
+    | Accurate(result) -> result
+    | Inaccurate(maxPoint) ->
+        let startPoint = maxPoint - 0.5
+        let interval = 0.25
+        
+        binaryRec checkFunc startPoint interval
 
 let solve x z =
-    let evalFunc current =
+    let checkFunc current =
         match x ** current with
         | y when y = z -> Finish
         | y when y < z -> TooLow
         | _            -> TooHigh
     
-    binarySearch evalFunc (Math.Max(x, z))
+    hybridSearch checkFunc
 
 
 let consoleIn (message : string) =
