@@ -1,30 +1,35 @@
 open System
 open System.Diagnostics
 
-// dont make me deal with c# janky math funcs in f#
-let round (places: int) (num: float) = Math.Round(num,places)
-let roundDecimal = round 13 // this number sets how many decimal places we actually care about
+// tail recursive generic binary search
+type BinarySearchCheck = Finish | TooHigh | TooLow
+
+let binarySearch evalFunc startPoint =
+    let rec searchRec evalFunc current interval =
+        let evaluated = evalFunc current
+        match evaluated with
+        | Finish -> current
+        | TooHigh -> searchRec evalFunc (current - interval) (interval / 2.0)
+        | TooLow -> searchRec evalFunc (current + interval) (interval / 2.0)
+    
+    searchRec evalFunc startPoint (startPoint / 2.0)
+
+let solve x z =
+    let evalFunc current =
+        match x ** current with
+        | y when y = z -> Finish
+        | y when y < z -> TooLow
+        | _            -> TooHigh
+    
+    binarySearch evalFunc (Math.Max(x, z))
 
 
 let consoleIn (message : string) =
     printf "%s" (message + ": ")
     Console.ReadLine() |> float
 
-// should be a recursive binary search
-let rec solveRecurse x z interval current =
-    if roundDecimal (x ** current) = roundDecimal z then current
-    else    
-        let next adjCurrent adjInterval = solveRecurse x z adjInterval adjCurrent
-        if x ** current < z then
-            next (current + interval) interval
-        else
-            let newInterval = interval / 2.0
-            next (current - newInterval) newInterval
-            
-let solve x z = solveRecurse x z 1.0 1.0
-
 [<EntryPoint>]
-let main argv =
+let main _ =
     printfn "in the equation x^y = z:"
     let x = consoleIn "please enter x"
     let z = consoleIn "please enter z"
